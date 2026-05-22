@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividades Misión JBP - Anexo Puerto Bermúdez</title>
+    <!-- Iconos Modernos (FontAwesome) -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-1: #3b82f6;
+            --accent-2: #ec4899;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #38bdf8;
+            text-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .admin-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .hidden { display: none !important; }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .month-section {
+            margin-bottom: 40px;
+        }
+
+        .month-title {
+            font-size: 1.5rem;
+            text-transform: capitalize;
+            border-left: 4px solid #38bdf8;
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-muted);
+            padding: 10px 0;
+        }
+
+        .day-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            min-height: 100px;
+            border-radius: 8px;
+            padding: 8px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            border-color: #475569;
+        }
+
+        .day-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        /* Lógica visual de mitades de colores */
+        .bg-act-1 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.4) 100%); }
+        .bg-act-2 { background: linear-gradient(135deg, rgba(236, 72, 153, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%); }
+        .bg-act-double { 
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 50%, rgba(236, 72, 153, 0.4) 50%); 
+        }
+
+        .act-indicator {
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.4);
+            padding: 2px 5px;
+            border-radius: 4px;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Ventana Modal de Detalles */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .comment-box {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #a855f7;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><i class="fa-solid fa-calendar-days"></i> Actividades Misión JBP - Anexo Puerto Bermúdez</h1>
+    <button id="loginBtn" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Modo Administrador</button>
+</header>
+
+<!-- Panel de Administración Oculto -->
+<div id="adminPanel" class="admin-panel hidden">
+    <h3><i class="fa-solid fa-plus"></i> Nueva Actividad</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div class="form-group"><label>Nombre de Actividad</label><input type="text" id="actName"></div>
+        <div class="form-group"><label>Lugar</label><input type="text" id="actPlace"></div>
+        <div class="form-group"><label>Fecha Inicio</label><input type="date" id="actStart"></div>
+        <div class="form-group"><label>Fecha Fin</label><input type="date" id="actEnd"></div>
+    </div>
+    <div class="form-group"><label>Objetivo</label><textarea id="actObjective" rows="2"></textarea></div>
+    <div class="form-group"><label>Equipo de Trabajo (Cargos)</label><input type="text" id="actTeam" placeholder="Ej: Juan (Coordinador), Ana (Logística)"></div>
+    <div class="form-group"><label>Materiales</label><input type="text" id="actMaterials" placeholder="Ej: Sillas, Sonido, Biblias"></div>
+    <div class="form-group"><label>Plan de Emergencia</label><textarea id="actEmergency" rows="2"></textarea></div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        <div class="form-group">
+            <label>Calificación (Palabras)</label>
+            <input type="text" id="actRating" placeholder="Ej: Excelente, Regular">
+        </div>
+        <div class="form-group"><label>¿Qué faltó?</label><input type="text" id="actMissing"></div>
+        <div class="form-group"><label>¿Qué se mejoraría/aumentaría?</label><input type="text" id="actImprove"></div>
+    </div>
+    <button onclick="saveActivity()"><i class="fa-solid fa-save"></i> Guardar Actividad</button>
+</div>
+
+<!-- Calendarios -->
+<div id="currentMonthSection" class="month-section"></div>
+<div id="nextMonthSection" class="month-section"></div>
+
+<!-- Modal para Detalle y Comentarios -->
+<div id="detailModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle" style="color: #38bdf8;"></h2>
+        <div id="modalDetails"></div>
+        <hr style="border-color: var(--border); margin: 20px 0;">
+        
+        <!-- Sección de Comentarios -->
+        <div id="commentSection">
+            <h3><i class="fa-solid fa-comments"></i> Opiniones de Visitantes</h3>
+            <div id="commentsList"></div>
+            <div class="form-group" style="margin-top:15px;">
+                <label>Deja tu comentario (No se podrá borrar)</label>
+                <textarea id="newComment" rows="2" placeholder="Escribe aquí tu opinión..."></textarea>
+                <button onclick="submitComment()" style="margin-top:10px;"><i class="fa-solid fa-paper-plane"></i> Enviar Opinión</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de Firebase Libs -->
+<script type="module">
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyA-RriIQQExYHjTikAa_CKYN81AZfdGSKk",
+  authDomain: "mision-jbp-puerto-bermudez.firebaseapp.com",
+  projectId: "mision-jbp-puerto-bermudez",
+  storageBucket: "mision-jbp-puerto-bermudez.firebasestorage.app",
+  messagingSenderId: "522300449488",
+  appId: "1:522300449488:web:5ca675fee4a33c70bb74d5"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+    
+    const db = getDatabase(app);
+
+    // Variables de Estado Global
+    let isAdmin = false;
+    let dbActivities = {};
+    let selectedDateString = "";
+    let firstDayActivityId = null;
+
+    // Hacer funciones accesibles globalmente para los clics en HTML
+    window.toggleAdmin = function() {
+        if (!isAdmin) {
+            const pass = prompt("Introduce la contraseña de administrador:");
+            if (pass === "1q2") {
+                isAdmin = true;
+                document.getElementById("adminPanel").classList.remove("hidden");
+                document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir de Admin';
+            } else {
+                alert("Contraseña incorrecta");
+            }
+        } else {
+            isAdmin = false;
+            document.getElementById("adminPanel").classList.add("hidden");
+            document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-lock"></i> Modo Administrador';
+        }
+    }
+
+    window.saveActivity = function() {
+        const name = document.getElementById("actName").value;
+        const place = document.getElementById("actPlace").value;
+        const start = document.getElementById("actStart").value;
+        const end = document.getElementById("actEnd").value;
+        const objective = document.getElementById("actObjective").value;
+        const team = document.getElementById("actTeam").value;
+        const materials = document.getElementById("actMaterials").value;
+        const emergency = document.getElementById("actEmergency").value;
+        const rating = document.getElementById("actRating").value;
+        const missing = document.getElementById("actMissing").value;
+        const improve = document.getElementById("actImprove").value;
+
+        if (!name || !start || !end) return alert("Nombre, Fecha de Inicio y Fin son obligatorios.");
+
+        const newActRef = push(ref(db, 'activities'));
+        set(newActRef, {
+            id: newActRef.key, name, place, start, end, objective, team, materials, emergency, rating, missing, improve
+        }).then(() => {
+            alert("Actividad guardada con éxito");
+            document.querySelectorAll("#adminPanel input, #adminPanel textarea").forEach(i => i.value = "");
+        });
+    }
+
+    window.openDay = function(dateStr) {
+        selectedDateString = dateStr;
+        const acts = getActivitiesForDate(dateStr);
+        
+        let html = `<p><i class="fa-solid fa-calendar-day"></i> <strong>Fecha:</strong> ${dateStr}</p>`;
+        firstDayActivityId = null;
+
+        if (acts.length === 0) {
+            html += `<p>No hay actividades programadas para este día.</p>`;
+            document.getElementById("commentSection").classList.add("hidden");
+        } else {
+            acts.forEach((act, index) => {
+                html += `
+                    <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:15px; border-top: 4px solid ${index===0?'#3b82f6':'#ec4899'}">
+                        <h3><i class="fa-solid fa-star"></i> ${act.name}</h3>
+                        <p><strong><i class="fa-solid fa-location-dot"></i> Lugar:</strong> ${act.place || 'No asignado'}</p>
+                        <p><strong><i class="fa-solid fa-bullseye"></i> Objetivo:</strong> ${act.objective || 'No asignado'}</p>
+                        <p><strong><i class="fa-solid fa-users"></i> Equipo:</strong> ${act.team || 'No asignado'}</p>
+                        <p><strong><i class="fa-solid fa-box"></i> Materiales:</strong> ${act.materials || 'No asignado'}</p>
+                        <p><strong><i class="fa-solid fa-kit-medical"></i> Plan de Emergencia:</strong> ${act.emergency || 'No asignado'}</p>
+                        <p><strong><i class="fa-solid fa-award"></i> Calificación:</strong> ${act.rating || 'Sin calificar'}</p>
+                        <p><strong><i class="fa-solid fa-triangle-exclamation"></i> ¿Qué faltó?:</strong> ${act.missing || 'Nada'}</p>
+                        <p><strong><i class="fa-solid fa-arrow-up-right-dots"></i> Mejoras:</strong> ${act.improve || 'Ninguna'}</p>
+                    </div>
+                `;
+                // El cuadro de opiniones solo se activa si es exactamente el primer día de la actividad
+                if (act.start === dateStr) {
+                    firstDayActivityId = act.id;
+                }
+            });
+
+            if (firstDayActivityId) {
+                document.getElementById("commentSection").classList.remove("hidden");
+                loadComments(firstDayActivityId);
+            } else {
+                html += `<p style="color:var(--text-muted); font-size:0.9rem;"><i class="fa-solid fa-info-circle"></i> Las opiniones solo se permiten en el primer día de inicio de la actividad.</p>`;
+                document.getElementById("commentSection").classList.add("hidden");
+            }
+        }
+
+        document.getElementById("modalTitle").innerText = `Detalles del Día`;
+        document.getElementById("modalDetails").innerHTML = html;
+        document.getElementById("detailModal").classList.remove("hidden");
+    }
+
+    window.closeModal = function() {
+        document.getElementById("detailModal").classList.add("hidden");
+    }
+
+    window.submitComment = function() {
+        const commentText = document.getElementById("newComment").value.trim();
+        if (!commentText || !firstDayActivityId) return;
+
+        const commentRef = push(ref(db, `comments/${firstDayActivityId}`));
+        set(commentRef, {
+            text: commentText,
+            timestamp: new Date().toISOString()
+        }).then(() => {
+            document.getElementById("newComment").value = "";
+            loadComments(firstDayActivityId);
+        });
+    }
+
+    function loadComments(actId) {
+        const commentsList = document.getElementById("commentsList");
+        commentsList.innerHTML = "Cargando opiniones...";
+        
+        onValue(ref(db, `comments/${actId}`), (snapshot) => {
+            commentsList.innerHTML = "";
+            const data = snapshot.val();
+            if (!data) {
+                commentsList.innerHTML = "<p>No hay opiniones aún. ¡Sé el primero!</p>";
+                return;
+            }
+            Object.values(data).forEach(c => {
+                const div = document.createElement("div");
+                div.className = "comment-box";
+                div.innerHTML = `<p style="margin:0; font-size:0.95rem;">${c.text}</p>`;
+                commentsList.appendChild(div);
+            });
+        });
+    }
+
+    // Lógica Matemática de Calendarios e Interfección de Fechas
+    function getActivitiesForDate(dateStr) {
+        let currentDayActs = [];
+        Object.values(dbActivities).forEach(act => {
+            if (dateStr >= act.start && dateStr <= act.end) {
+                currentDayActs.push(act);
+            }
+        });
+        return currentDayActs;
+    }
+
+    function renderCalendar(containerId, year, month, titleLabel) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `<h2 class="month-title">${titleLabel}</h2>`;
+        
+        const grid = document.createElement("div");
+        grid.className = "calendar-grid";
+        
+        const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+        daysOfWeek.forEach(d => {
+            const h = document.createElement("div");
+            h.className = "calendar-header";
+            h.innerText = d;
+            grid.appendChild(h);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        for (let i = 0; i < firstDay; i++) {
+            grid.appendChild(document.createElement("div"));
+        }
+
+        for (let day = 1; day <= totalDays; day++) {
+            const card = document.createElement("div");
+            card.className = "day-card";
+            
+            const monthStr = String(month + 1).padStart(2, '0');
+            const dayStr = String(day).padStart(2, '0');
+            const dateStr = `${year}-${monthStr}-${dayStr}`;
+            
+            card.onclick = () => openDay(dateStr);
+            
+            const num = document.createElement("div");
+            num.className = "day-number";
+            num.innerText = day;
+            card.appendChild(num);
+
+            // Verificar cuántas actividades coinciden hoy
+            const dayActs = getActivitiesForDate(dateStr);
+            if (dayActs.length === 1) {
+                card.classList.add("bg-act-1");
+                appendIndicator(card, dayActs[0].name);
+            } else if (dayActs.length >= 2) {
+                card.classList.add("bg-act-double"); // Mitad azul, mitad rosa
+                appendIndicator(card, dayActs[0].name);
+                appendIndicator(card, dayActs[1].name);
+            }
+
+            grid.appendChild(card);
+        }
+        container.appendChild(grid);
+    }
+
+    function appendIndicator(card, text) {
+        const ind = document.createElement("div");
+        ind.className = "act-indicator";
+        ind.innerText = text;
+        card.appendChild(ind);
+    }
+
+    function updateCalendars() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+
+        const nextMonthDate = new Date(currentYear, currentMonth + 1, 1);
+        
+        const names = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+        renderCalendar("currentMonthSection", currentYear, currentMonth, `${names[currentMonth]} ${currentYear}`);
+        renderCalendar("nextMonthSection", nextMonthDate.getFullYear(), nextMonthDate.getMonth(), `${names[nextMonthDate.getMonth()]} ${nextMonthDate.getFullYear()}`);
+    }
+
+    // Escuchar cambios de la Base de Datos en Tiempo Real
+    onValue(ref(db, 'activities'), (snapshot) => {
+        dbActivities = snapshot.val() || {};
+        updateCalendars();
+    });
+</script>
+</body>
+</html>
