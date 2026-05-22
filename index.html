@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Actividades Misión JBP - Anexo Puerto Bermúdez</title>
     <!-- Iconos Modernos (FontAwesome) -->
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-dark: #0f172a;
@@ -245,9 +245,8 @@
 <script type="module">
 
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -261,229 +260,228 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-    
-    const db = getDatabase(app);
+const db = getDatabase(app);
 
-    // Variables de Estado Global
-    let isAdmin = false;
-    let dbActivities = {};
-    let selectedDateString = "";
-    let firstDayActivityId = null;
+// Variables de Estado Global
+let isAdmin = false;
+let dbActivities = {};
+let selectedDateString = "";
+let firstDayActivityId = null;
 
-    // Hacer funciones accesibles globalmente para los clics en HTML
-    window.toggleAdmin = function() {
-        if (!isAdmin) {
-            const pass = prompt("Introduce la contraseña de administrador:");
-            if (pass === "1q2") {
-                isAdmin = true;
-                document.getElementById("adminPanel").classList.remove("hidden");
-                document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir de Admin';
-            } else {
-                alert("Contraseña incorrecta");
-            }
+// Hacer funciones accesibles globalmente para los clics en HTML
+window.toggleAdmin = function() {
+    if (!isAdmin) {
+        const pass = prompt("Introduce la contraseña de administrador:");
+        if (pass === "1q2") {
+            isAdmin = true;
+            document.getElementById("adminPanel").classList.remove("hidden");
+            document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir de Admin';
         } else {
-            isAdmin = false;
-            document.getElementById("adminPanel").classList.add("hidden");
-            document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-lock"></i> Modo Administrador';
+            alert("Contraseña incorrecta");
         }
+    } else {
+        isAdmin = false;
+        document.getElementById("adminPanel").classList.add("hidden");
+        document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-lock"></i> Modo Administrador';
     }
+}
 
-    window.saveActivity = function() {
-        const name = document.getElementById("actName").value;
-        const place = document.getElementById("actPlace").value;
-        const start = document.getElementById("actStart").value;
-        const end = document.getElementById("actEnd").value;
-        const objective = document.getElementById("actObjective").value;
-        const team = document.getElementById("actTeam").value;
-        const materials = document.getElementById("actMaterials").value;
-        const emergency = document.getElementById("actEmergency").value;
-        const rating = document.getElementById("actRating").value;
-        const missing = document.getElementById("actMissing").value;
-        const improve = document.getElementById("actImprove").value;
+window.saveActivity = function() {
+    const name = document.getElementById("actName").value;
+    const place = document.getElementById("actPlace").value;
+    const start = document.getElementById("actStart").value;
+    const end = document.getElementById("actEnd").value;
+    const objective = document.getElementById("actObjective").value;
+    const team = document.getElementById("actTeam").value;
+    const materials = document.getElementById("actMaterials").value;
+    const emergency = document.getElementById("actEmergency").value;
+    const rating = document.getElementById("actRating").value;
+    const missing = document.getElementById("actMissing").value;
+    const improve = document.getElementById("actImprove").value;
 
-        if (!name || !start || !end) return alert("Nombre, Fecha de Inicio y Fin son obligatorios.");
+    if (!name || !start || !end) return alert("Nombre, Fecha de Inicio y Fin son obligatorios.");
 
-        const newActRef = push(ref(db, 'activities'));
-        set(newActRef, {
-            id: newActRef.key, name, place, start, end, objective, team, materials, emergency, rating, missing, improve
-        }).then(() => {
-            alert("Actividad guardada con éxito");
-            document.querySelectorAll("#adminPanel input, #adminPanel textarea").forEach(i => i.value = "");
-        });
-    }
-
-    window.openDay = function(dateStr) {
-        selectedDateString = dateStr;
-        const acts = getActivitiesForDate(dateStr);
-        
-        let html = `<p><i class="fa-solid fa-calendar-day"></i> <strong>Fecha:</strong> ${dateStr}</p>`;
-        firstDayActivityId = null;
-
-        if (acts.length === 0) {
-            html += `<p>No hay actividades programadas para este día.</p>`;
-            document.getElementById("commentSection").classList.add("hidden");
-        } else {
-            acts.forEach((act, index) => {
-                html += `
-                    <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:15px; border-top: 4px solid ${index===0?'#3b82f6':'#ec4899'}">
-                        <h3><i class="fa-solid fa-star"></i> ${act.name}</h3>
-                        <p><strong><i class="fa-solid fa-location-dot"></i> Lugar:</strong> ${act.place || 'No asignado'}</p>
-                        <p><strong><i class="fa-solid fa-bullseye"></i> Objetivo:</strong> ${act.objective || 'No asignado'}</p>
-                        <p><strong><i class="fa-solid fa-users"></i> Equipo:</strong> ${act.team || 'No asignado'}</p>
-                        <p><strong><i class="fa-solid fa-box"></i> Materiales:</strong> ${act.materials || 'No asignado'}</p>
-                        <p><strong><i class="fa-solid fa-kit-medical"></i> Plan de Emergencia:</strong> ${act.emergency || 'No asignado'}</p>
-                        <p><strong><i class="fa-solid fa-award"></i> Calificación:</strong> ${act.rating || 'Sin calificar'}</p>
-                        <p><strong><i class="fa-solid fa-triangle-exclamation"></i> ¿Qué faltó?:</strong> ${act.missing || 'Nada'}</p>
-                        <p><strong><i class="fa-solid fa-arrow-up-right-dots"></i> Mejoras:</strong> ${act.improve || 'Ninguna'}</p>
-                    </div>
-                `;
-                // El cuadro de opiniones solo se activa si es exactamente el primer día de la actividad
-                if (act.start === dateStr) {
-                    firstDayActivityId = act.id;
-                }
-            });
-
-            if (firstDayActivityId) {
-                document.getElementById("commentSection").classList.remove("hidden");
-                loadComments(firstDayActivityId);
-            } else {
-                html += `<p style="color:var(--text-muted); font-size:0.9rem;"><i class="fa-solid fa-info-circle"></i> Las opiniones solo se permiten en el primer día de inicio de la actividad.</p>`;
-                document.getElementById("commentSection").classList.add("hidden");
-            }
-        }
-
-        document.getElementById("modalTitle").innerText = `Detalles del Día`;
-        document.getElementById("modalDetails").innerHTML = html;
-        document.getElementById("detailModal").classList.remove("hidden");
-    }
-
-    window.closeModal = function() {
-        document.getElementById("detailModal").classList.add("hidden");
-    }
-
-    window.submitComment = function() {
-        const commentText = document.getElementById("newComment").value.trim();
-        if (!commentText || !firstDayActivityId) return;
-
-        const commentRef = push(ref(db, `comments/${firstDayActivityId}`));
-        set(commentRef, {
-            text: commentText,
-            timestamp: new Date().toISOString()
-        }).then(() => {
-            document.getElementById("newComment").value = "";
-            loadComments(firstDayActivityId);
-        });
-    }
-
-    function loadComments(actId) {
-        const commentsList = document.getElementById("commentsList");
-        commentsList.innerHTML = "Cargando opiniones...";
-        
-        onValue(ref(db, `comments/${actId}`), (snapshot) => {
-            commentsList.innerHTML = "";
-            const data = snapshot.val();
-            if (!data) {
-                commentsList.innerHTML = "<p>No hay opiniones aún. ¡Sé el primero!</p>";
-                return;
-            }
-            Object.values(data).forEach(c => {
-                const div = document.createElement("div");
-                div.className = "comment-box";
-                div.innerHTML = `<p style="margin:0; font-size:0.95rem;">${c.text}</p>`;
-                commentsList.appendChild(div);
-            });
-        });
-    }
-
-    // Lógica Matemática de Calendarios e Interfección de Fechas
-    function getActivitiesForDate(dateStr) {
-        let currentDayActs = [];
-        Object.values(dbActivities).forEach(act => {
-            if (dateStr >= act.start && dateStr <= act.end) {
-                currentDayActs.push(act);
-            }
-        });
-        return currentDayActs;
-    }
-
-    function renderCalendar(containerId, year, month, titleLabel) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = `<h2 class="month-title">${titleLabel}</h2>`;
-        
-        const grid = document.createElement("div");
-        grid.className = "calendar-grid";
-        
-        const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-        daysOfWeek.forEach(d => {
-            const h = document.createElement("div");
-            h.className = "calendar-header";
-            h.innerText = d;
-            grid.appendChild(h);
-        });
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const totalDays = new Date(year, month + 1, 0).getDate();
-
-        for (let i = 0; i < firstDay; i++) {
-            grid.appendChild(document.createElement("div"));
-        }
-
-        for (let day = 1; day <= totalDays; day++) {
-            const card = document.createElement("div");
-            card.className = "day-card";
-            
-            const monthStr = String(month + 1).padStart(2, '0');
-            const dayStr = String(day).padStart(2, '0');
-            const dateStr = `${year}-${monthStr}-${dayStr}`;
-            
-            card.onclick = () => openDay(dateStr);
-            
-            const num = document.createElement("div");
-            num.className = "day-number";
-            num.innerText = day;
-            card.appendChild(num);
-
-            // Verificar cuántas actividades coinciden hoy
-            const dayActs = getActivitiesForDate(dateStr);
-            if (dayActs.length === 1) {
-                card.classList.add("bg-act-1");
-                appendIndicator(card, dayActs[0].name);
-            } else if (dayActs.length >= 2) {
-                card.classList.add("bg-act-double"); // Mitad azul, mitad rosa
-                appendIndicator(card, dayActs[0].name);
-                appendIndicator(card, dayActs[1].name);
-            }
-
-            grid.appendChild(card);
-        }
-        container.appendChild(grid);
-    }
-
-    function appendIndicator(card, text) {
-        const ind = document.createElement("div");
-        ind.className = "act-indicator";
-        ind.innerText = text;
-        card.appendChild(ind);
-    }
-
-    function updateCalendars() {
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth();
-
-        const nextMonthDate = new Date(currentYear, currentMonth + 1, 1);
-        
-        const names = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-
-        renderCalendar("currentMonthSection", currentYear, currentMonth, `${names[currentMonth]} ${currentYear}`);
-        renderCalendar("nextMonthSection", nextMonthDate.getFullYear(), nextMonthDate.getMonth(), `${names[nextMonthDate.getMonth()]} ${nextMonthDate.getFullYear()}`);
-    }
-
-    // Escuchar cambios de la Base de Datos en Tiempo Real
-    onValue(ref(db, 'activities'), (snapshot) => {
-        dbActivities = snapshot.val() || {};
-        updateCalendars();
+    const newActRef = push(ref(db, 'activities'));
+    set(newActRef, {
+        id: newActRef.key, name, place, start, end, objective, team, materials, emergency, rating, missing, improve
+    }).then(() => {
+        alert("Actividad guardada con éxito");
+        document.querySelectorAll("#adminPanel input, #adminPanel textarea").forEach(i => i.value = "");
     });
+}
+
+window.openDay = function(dateStr) {
+    selectedDateString = dateStr;
+    const acts = getActivitiesForDate(dateStr);
+    
+    let html = `<p><i class="fa-solid fa-calendar-day"></i> <strong>Fecha:</strong> ${dateStr}</p>`;
+    firstDayActivityId = null;
+
+    if (acts.length === 0) {
+        html += `<p>No hay actividades programadas para este día.</p>`;
+        document.getElementById("commentSection").classList.add("hidden");
+    } else {
+        acts.forEach((act, index) => {
+            html += `
+                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:15px; border-top: 4px solid ${index===0?'#3b82f6':'#ec4899'}">
+                    <h3><i class="fa-solid fa-star"></i> ${act.name}</h3>
+                    <p><strong><i class="fa-solid fa-location-dot"></i> Lugar:</strong> ${act.place || 'No asignado'}</p>
+                    <p><strong><i class="fa-solid fa-bullseye"></i> Objetivo:</strong> ${act.objective || 'No asignado'}</p>
+                    <p><strong><i class="fa-solid fa-users"></i> Equipo:</strong> ${act.team || 'No asignado'}</p>
+                    <p><strong><i class="fa-solid fa-box"></i> Materiales:</strong> ${act.materials || 'No asignado'}</p>
+                    <p><strong><i class="fa-solid fa-kit-medical"></i> Plan de Emergencia:</strong> ${act.emergency || 'No asignado'}</p>
+                    <p><strong><i class="fa-solid fa-award"></i> Calificación:</strong> ${act.rating || 'Sin calificar'}</p>
+                    <p><strong><i class="fa-solid fa-triangle-exclamation"></i> ¿Qué faltó?:</strong> ${act.missing || 'Nada'}</p>
+                    <p><strong><i class="fa-solid fa-arrow-up-right-dots"></i> Mejoras:</strong> ${act.improve || 'Ninguna'}</p>
+                </div>
+            `;
+            // El cuadro de opiniones solo se activa si es exactamente el primer día de la actividad
+            if (act.start === dateStr) {
+                firstDayActivityId = act.id;
+            }
+        });
+
+        if (firstDayActivityId) {
+            document.getElementById("commentSection").classList.remove("hidden");
+            loadComments(firstDayActivityId);
+        } else {
+            html += `<p style="color:var(--text-muted); font-size:0.9rem;"><i class="fa-solid fa-info-circle"></i> Las opiniones solo se permiten en el primer día de inicio de la actividad.</p>`;
+            document.getElementById("commentSection").classList.add("hidden");
+        }
+    }
+
+    document.getElementById("modalTitle").innerText = `Detalles del Día`;
+    document.getElementById("modalDetails").innerHTML = html;
+    document.getElementById("detailModal").classList.remove("hidden");
+}
+
+window.closeModal = function() {
+    document.getElementById("detailModal").classList.add("hidden");
+}
+
+window.submitComment = function() {
+    const commentText = document.getElementById("newComment").value.trim();
+    if (!commentText || !firstDayActivityId) return;
+
+    const commentRef = push(ref(db, `comments/${firstDayActivityId}`));
+    set(commentRef, {
+        text: commentText,
+        timestamp: new Date().toISOString()
+    }).then(() => {
+        document.getElementById("newComment").value = "";
+        loadComments(firstDayActivityId);
+    });
+}
+
+function loadComments(actId) {
+    const commentsList = document.getElementById("commentsList");
+    commentsList.innerHTML = "Cargando opiniones...";
+    
+    onValue(ref(db, `comments/${actId}`), (snapshot) => {
+        commentsList.innerHTML = "";
+        const data = snapshot.val();
+        if (!data) {
+            commentsList.innerHTML = "<p>No hay opiniones aún. ¡Sé el primero!</p>";
+            return;
+        }
+        Object.values(data).forEach(c => {
+            const div = document.createElement("div");
+            div.className = "comment-box";
+            div.innerHTML = `<p style="margin:0; font-size:0.95rem;">${c.text}</p>`;
+            commentsList.appendChild(div);
+        });
+    });
+}
+
+// Lógica Matemática de Calendarios e Interfección de Fechas
+function getActivitiesForDate(dateStr) {
+    let currentDayActs = [];
+    Object.values(dbActivities).forEach(act => {
+        if (dateStr >= act.start && dateStr <= act.end) {
+            currentDayActs.push(act);
+        }
+    });
+    return currentDayActs;
+}
+
+function renderCalendar(containerId, year, month, titleLabel) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = `<h2 class="month-title">${titleLabel}</h2>`;
+    
+    const grid = document.createElement("div");
+    grid.className = "calendar-grid";
+    
+    const daysOfWeek = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    daysOfWeek.forEach(d => {
+        const h = document.createElement("div");
+        h.className = "calendar-header";
+        h.innerText = d;
+        grid.appendChild(h);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= totalDays; day++) {
+        const card = document.createElement("div");
+        card.className = "day-card";
+        
+        const monthStr = String(month + 1).padStart(2, '0');
+        const dayStr = String(day).padStart(2, '0');
+        const dateStr = `${year}-${monthStr}-${dayStr}`;
+        
+        card.onclick = () => openDay(dateStr);
+        
+        const num = document.createElement("div");
+        num.className = "day-number";
+        num.innerText = day;
+        card.appendChild(num);
+
+        // Verificar cuántas actividades coinciden hoy
+        const dayActs = getActivitiesForDate(dateStr);
+        if (dayActs.length === 1) {
+            card.classList.add("bg-act-1");
+            appendIndicator(card, dayActs[0].name);
+        } else if (dayActs.length >= 2) {
+            card.classList.add("bg-act-double"); // Mitad azul, mitad rosa
+            appendIndicator(card, dayActs[0].name);
+            appendIndicator(card, dayActs[1].name);
+        }
+
+        grid.appendChild(card);
+    }
+    container.appendChild(grid);
+}
+
+function appendIndicator(card, text) {
+    const ind = document.createElement("div");
+    ind.className = "act-indicator";
+    ind.innerText = text;
+    card.appendChild(ind);
+}
+
+function updateCalendars() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    const nextMonthDate = new Date(currentYear, currentMonth + 1, 1);
+    
+    const names = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+
+    renderCalendar("currentMonthSection", currentYear, currentMonth, `${names[currentMonth]} ${currentYear}`);
+    renderCalendar("nextMonthSection", nextMonthDate.getFullYear(), nextMonthDate.getMonth(), `${names[nextMonthDate.getMonth()]} ${nextMonthDate.getFullYear()}`);
+}
+
+// Escuchar cambios de la Base de Datos en Tiempo Real
+onValue(ref(db, 'activities'), (snapshot) => {
+    dbActivities = snapshot.val() || {};
+    updateCalendars();
+});
 </script>
 </body>
 </html>
