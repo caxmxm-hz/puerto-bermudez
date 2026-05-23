@@ -387,6 +387,9 @@ window.saveActivity = function() {
     }).then(() => {
         alert("Actividad guardada con éxito");
         document.querySelectorAll("#adminPanel input, #adminPanel textarea").forEach(i => i.value = "");
+    }).catch(error => {
+        console.error("Error al guardar actividad:", error);
+        alert("Error al guardar: " + error.message);
     });
 }
 
@@ -450,6 +453,9 @@ window.submitComment = function() {
     }).then(() => {
         document.getElementById("newComment").value = "";
         loadComments(firstDayActivityId);
+    }).catch(error => {
+        console.error("Error al guardar comentario:", error);
+        alert("Error: " + error.message);
     });
 }
 
@@ -470,6 +476,8 @@ function loadComments(actId) {
             div.innerHTML = `<p style="margin:0; font-size:0.95rem;">${c.text}</p>`;
             commentsList.appendChild(div);
         });
+    }, (error) => {
+        console.error("Error al cargar comentarios:", error);
     });
 }
 
@@ -486,6 +494,11 @@ function getActivitiesForDate(dateStr) {
 
 function renderCalendar(containerId, year, month, titleLabel) {
     const container = document.getElementById(containerId);
+    if (!container) {
+        console.error("Contenedor no encontrado:", containerId);
+        return;
+    }
+    
     container.innerHTML = `<h2 class="month-title">${titleLabel}</h2>`;
     
     const grid = document.createElement("div");
@@ -514,7 +527,7 @@ function renderCalendar(containerId, year, month, titleLabel) {
         const dayStr = String(day).padStart(2, '0');
         const dateStr = `${year}-${monthStr}-${dayStr}`;
         
-        card.onclick = () => openDay(dateStr);
+        card.onclick = () => window.openDay(dateStr);
         
         const num = document.createElement("div");
         num.className = "day-number";
@@ -553,14 +566,22 @@ function updateCalendars() {
     
     const names = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 
+    console.log("Actualizando calendarios para:", currentMonth, currentYear);
     renderCalendar("currentMonthSection", currentYear, currentMonth, `${names[currentMonth]} ${currentYear}`);
     renderCalendar("nextMonthSection", nextMonthDate.getFullYear(), nextMonthDate.getMonth(), `${names[nextMonthDate.getMonth()]} ${nextMonthDate.getFullYear()}`);
 }
 
+// Llamar updateCalendars inmediatamente para mostrar calendarios vacíos mientras se cargan los datos
+console.log("Iniciando aplicación...");
+updateCalendars();
+
 // Escuchar cambios de la Base de Datos en Tiempo Real
 onValue(ref(db, 'activities'), (snapshot) => {
     dbActivities = snapshot.val() || {};
+    console.log("Actividades cargadas:", dbActivities);
     updateCalendars();
+}, (error) => {
+    console.error("Error al cargar actividades de Firebase:", error);
 });
 </script>
 </body>
