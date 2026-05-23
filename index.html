@@ -518,7 +518,7 @@
 <header>
     <h1><i class="fa-solid fa-calendar-days"></i> Actividades Misión JBP</h1>
     <div class="header-buttons">
-        <button id="loginBtn" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Administrador</button>
+        <button id="loginBtn" onclick="window.toggleAdmin()"><i class="fa-solid fa-lock"></i> Administrador</button>
     </div>
 </header>
 
@@ -549,7 +549,7 @@
         <div class="form-group"><label>¿Qué faltó?</label><input type="text" id="actMissing"></div>
         <div class="form-group"><label>¿Qué se mejoraría?</label><input type="text" id="actImprove"></div>
     </div>
-    <button onclick="saveActivity()"><i class="fa-solid fa-save"></i> Guardar Actividad</button>
+    <button onclick="window.saveActivity()"><i class="fa-solid fa-save"></i> Guardar Actividad</button>
 </div>
 
 <!-- Calendarios -->
@@ -561,7 +561,7 @@
 <!-- Modal para Detalle y Comentarios -->
 <div id="detailModal" class="modal hidden">
     <div class="modal-content">
-        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <button class="close-btn" onclick="window.closeModal()">&times;</button>
         <h2 id="modalTitle" style="color: #38bdf8;"></h2>
         <div id="modalDetails"></div>
         <hr style="border-color: var(--border); margin: 15px 0;">
@@ -573,18 +573,17 @@
             <div class="form-group" style="margin-top:12px;">
                 <label>Deja tu comentario (No se podrá borrar)</label>
                 <textarea id="newComment" rows="2" placeholder="Escribe aquí tu opinión..."></textarea>
-                <button onclick="submitComment()" style="margin-top:8px;"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+                <button onclick="window.submitComment()" style="margin-top:8px;"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Scripts de Firebase Libs -->
-<script type="module">
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyA-RriIQQExYHjTikAa_CKYN81AZfdGSKk",
   authDomain: "mision-jbp-puerto-bermudez.firebaseapp.com",
@@ -594,8 +593,8 @@ const firebaseConfig = {
   appId: "1:522300449488:web:5ca675fee4a33c70bb74d5"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 let isAdmin = false;
 let dbActivities = {};
@@ -665,8 +664,8 @@ window.saveActivity = function() {
         return;
     }
 
-    const newActRef = push(ref(db, 'activities'));
-    set(newActRef, {
+    const newActRef = db.ref('activities').push();
+    newActRef.set({
         id: newActRef.key, name, place, start, end, objective, team, materials, emergency, rating, missing, improve
     }).then(() => {
         showToast('✓ Actividad guardada con éxito', 'success');
@@ -732,8 +731,7 @@ window.submitComment = function() {
         return;
     }
 
-    const commentRef = push(ref(db, `comments/${firstDayActivityId}`));
-    set(commentRef, {
+    db.ref(`comments/${firstDayActivityId}`).push({
         text: commentText,
         timestamp: new Date().toISOString()
     }).then(() => {
@@ -750,7 +748,7 @@ function loadComments(actId) {
     const commentsList = document.getElementById("commentsList");
     commentsList.innerHTML = "Cargando opiniones...";
     
-    onValue(ref(db, `comments/${actId}`), (snapshot) => {
+    db.ref(`comments/${actId}`).on('value', (snapshot) => {
         commentsList.innerHTML = "";
         const data = snapshot.val();
         if (!data) {
@@ -763,8 +761,6 @@ function loadComments(actId) {
             div.innerHTML = `<p style="margin:0; font-size:0.9rem;">${c.text}</p>`;
             commentsList.appendChild(div);
         });
-    }, (error) => {
-        console.error("Error al cargar comentarios:", error);
     });
 }
 
@@ -859,7 +855,7 @@ function updateCalendars() {
 console.log("Iniciando aplicación...");
 updateCalendars();
 
-onValue(ref(db, 'activities'), (snapshot) => {
+db.ref('activities').on('value', (snapshot) => {
     dbActivities = snapshot.val() || {};
     console.log("Actividades cargadas:", dbActivities);
     updateCalendars();
