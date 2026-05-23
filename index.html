@@ -62,21 +62,28 @@
         }
 
         .user-mode-notice {
-            background: var(--bg-card);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(236, 72, 153, 0.1));
             border: 1px solid var(--border);
-            padding: 15px;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 20px;
             text-align: center;
             color: #38bdf8;
+            font-size: 0.9rem;
         }
 
         .admin-panel {
             background: var(--bg-card);
-            border: 1px solid var(--border);
+            border: 2px solid #ec4899;
             padding: 20px;
             border-radius: 12px;
             margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
+        }
+
+        .admin-panel h3 {
+            color: #ec4899;
+            margin-top: 0;
         }
 
         .hidden { display: none !important; }
@@ -115,8 +122,15 @@
 
         button:hover { opacity: 0.9; }
 
-        .month-section {
+        .calendars-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
             margin-bottom: 40px;
+        }
+
+        .month-section {
+            margin-bottom: 0;
         }
 
         .month-title {
@@ -125,12 +139,13 @@
             border-left: 4px solid #38bdf8;
             padding-left: 10px;
             margin-bottom: 15px;
+            color: #38bdf8;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 8px;
         }
 
         .calendar-header {
@@ -138,47 +153,51 @@
             font-weight: bold;
             color: var(--text-muted);
             padding: 10px 0;
+            font-size: 0.85rem;
         }
 
         .day-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            min-height: 100px;
+            min-height: 90px;
             border-radius: 8px;
             padding: 8px;
             position: relative;
             cursor: pointer;
             overflow: hidden;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .day-card:hover {
-            transform: translateY(-2px);
-            border-color: #475569;
+            transform: translateY(-3px);
+            border-color: #38bdf8;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
         }
 
         .day-number {
             font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 5px;
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: #94a3b8;
         }
 
         /* Lógica visual de mitades de colores */
-        .bg-act-1 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.4) 100%); }
-        .bg-act-2 { background: linear-gradient(135deg, rgba(236, 72, 153, 0.4) 0%, rgba(236, 72, 153, 0.4) 100%); }
+        .bg-act-1 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%); }
+        .bg-act-2 { background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%); }
         .bg-act-double { 
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 50%, rgba(236, 72, 153, 0.4) 50%); 
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 50%, rgba(236, 72, 153, 0.3) 50%); 
         }
 
         .act-indicator {
-            font-size: 0.75rem;
-            background: rgba(0,0,0,0.4);
-            padding: 2px 5px;
-            border-radius: 4px;
-            margin-top: 3px;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-top: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: #cbd5e1;
         }
 
         /* Ventana Modal de Detalles */
@@ -208,6 +227,11 @@
             cursor: pointer;
             font-size: 1.5rem;
             color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #38bdf8;
         }
 
         .comment-box {
@@ -216,6 +240,16 @@
             border-radius: 6px;
             margin-bottom: 8px;
             border-left: 3px solid #a855f7;
+        }
+
+        @media (max-width: 768px) {
+            .calendars-container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -230,7 +264,7 @@
 
 <!-- Aviso de Modo Usuario -->
 <div id="userModeNotice" class="user-mode-notice">
-    <i class="fa-solid fa-eye"></i> <strong>Modo Usuario:</strong> Visualiza las actividades programadas y deja tus opiniones.
+    <i class="fa-solid fa-eye"></i> Visualiza las actividades programadas y deja tus opiniones
 </div>
 
 <!-- Panel de Administración Oculto -->
@@ -258,9 +292,11 @@
     <button onclick="saveActivity()"><i class="fa-solid fa-save"></i> Guardar Actividad</button>
 </div>
 
-<!-- Calendarios -->
-<div id="currentMonthSection" class="month-section"></div>
-<div id="nextMonthSection" class="month-section"></div>
+<!-- Calendarios en lado a lado -->
+<div class="calendars-container">
+    <div id="currentMonthSection" class="month-section"></div>
+    <div id="nextMonthSection" class="month-section"></div>
+</div>
 
 <!-- Modal para Detalle y Comentarios -->
 <div id="detailModal" class="modal hidden">
