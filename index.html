@@ -17,29 +17,33 @@
             --border: #334155;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 12px;
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         h1 {
-            font-size: 2rem;
+            font-size: 1.5rem;
             color: #38bdf8;
             text-shadow: 0 2px 10px rgba(56, 189, 248, 0.2);
-            margin: 0 0 20px 0;
+            margin: 0 0 15px 0;
         }
 
         .header-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -48,12 +52,12 @@
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         #loginBtn:hover { 
@@ -64,69 +68,93 @@
         .user-mode-notice {
             background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(236, 72, 153, 0.1));
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
             color: #38bdf8;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .admin-panel {
             background: var(--bg-card);
             border: 2px solid #ec4899;
-            padding: 20px;
+            padding: 15px;
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 0 20px rgba(236, 72, 153, 0.1);
         }
 
         .admin-panel h3 {
             color: #ec4899;
             margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
         }
 
         .hidden { display: none !important; }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
         }
 
         label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
 
         input, textarea, select {
             background: #0f172a;
             border: 1px solid var(--border);
             color: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
         }
 
         button {
             background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
+            font-size: 0.95rem;
         }
 
         button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.98); }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
 
         .calendars-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .month-section {
@@ -134,54 +162,59 @@
         }
 
         .month-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             text-transform: capitalize;
             border-left: 4px solid #38bdf8;
             padding-left: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             color: #38bdf8;
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
         .calendar-header {
             text-align: center;
             font-weight: bold;
             color: var(--text-muted);
-            padding: 10px 0;
-            font-size: 0.85rem;
+            padding: 8px 0;
+            font-size: 0.75rem;
         }
 
         .day-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            min-height: 90px;
+            min-height: 70px;
             border-radius: 8px;
-            padding: 8px;
+            padding: 6px;
             position: relative;
             cursor: pointer;
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .day-card:active {
+            transform: scale(0.95);
         }
 
         .day-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             border-color: #38bdf8;
             box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
         }
 
         .day-number {
             font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 3px;
             color: #94a3b8;
         }
 
-        /* Lógica visual de mitades de colores */
         .bg-act-1 { background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%); }
         .bg-act-2 { background: linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%); }
         .bg-act-double { 
@@ -189,15 +222,17 @@
         }
 
         .act-indicator {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             background: rgba(0,0,0,0.5);
-            padding: 2px 4px;
-            border-radius: 3px;
-            margin-top: 2px;
+            padding: 2px 3px;
+            border-radius: 2px;
+            margin-top: 1px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             color: #cbd5e1;
+            flex: 1;
+            overflow: hidden;
         }
 
         /* Ventana Modal de Detalles */
@@ -209,15 +244,16 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 12px;
         }
 
         .modal-content {
             background: var(--bg-card);
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
-            width: 90%;
+            width: 100%;
             max-width: 600px;
-            max-height: 85vh;
+            max-height: 90vh;
             overflow-y: auto;
             border: 1px solid var(--border);
         }
@@ -228,6 +264,10 @@
             font-size: 1.5rem;
             color: var(--text-muted);
             transition: color 0.2s;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
         }
 
         .close-btn:hover {
@@ -240,14 +280,142 @@
             border-radius: 6px;
             margin-bottom: 8px;
             border-left: 3px solid #a855f7;
+            word-wrap: break-word;
         }
 
-        @media (max-width: 768px) {
+        .modal-details-item {
+            background:#0f172a;
+            padding:12px;
+            border-radius:8px;
+            margin-bottom:12px;
+            border-top: 4px solid #3b82f6;
+            word-wrap: break-word;
+        }
+
+        .modal-details-item p {
+            margin: 6px 0;
+            font-size: 0.9rem;
+        }
+
+        .modal-details-item h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .header-buttons {
+                gap: 6px;
+            }
+
+            #loginBtn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .admin-panel {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .day-card {
+                min-height: 65px;
+                padding: 5px;
+            }
+
+            .calendar-header {
+                font-size: 0.7rem;
+                padding: 6px 0;
+            }
+
+            .day-number {
+                font-size: 0.75rem;
+            }
+
+            .modal-content {
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            button {
+                padding: 9px;
+                font-size: 0.9rem;
+            }
+
+            .close-btn {
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
             .calendars-container {
                 grid-template-columns: 1fr;
             }
 
+            .form-grid-2 {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
             h1 {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            body {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .calendars-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+            }
+
+            .form-grid-2 {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 15px;
+            }
+
+            .day-card {
+                min-height: 90px;
+                padding: 8px;
+            }
+
+            .month-title {
                 font-size: 1.5rem;
             }
         }
@@ -256,7 +424,7 @@
 <body>
 
 <header>
-    <h1><i class="fa-solid fa-calendar-days"></i> Actividades Misión JBP - Anexo Puerto Bermúdez</h1>
+    <h1><i class="fa-solid fa-calendar-days"></i> Actividades Misión JBP</h1>
     <div class="header-buttons">
         <button id="loginBtn" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Administrador</button>
     </div>
@@ -270,7 +438,7 @@
 <!-- Panel de Administración Oculto -->
 <div id="adminPanel" class="admin-panel hidden">
     <h3><i class="fa-solid fa-plus"></i> Nueva Actividad</h3>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <div class="form-grid-2">
         <div class="form-group"><label>Nombre de Actividad</label><input type="text" id="actName"></div>
         <div class="form-group"><label>Lugar</label><input type="text" id="actPlace"></div>
         <div class="form-group"><label>Fecha Inicio</label><input type="date" id="actStart"></div>
@@ -281,18 +449,18 @@
     <div class="form-group"><label>Materiales</label><input type="text" id="actMaterials" placeholder="Ej: Sillas, Sonido, Biblias"></div>
     <div class="form-group"><label>Plan de Emergencia</label><textarea id="actEmergency" rows="2"></textarea></div>
     
-    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+    <div class="form-grid-3">
         <div class="form-group">
             <label>Calificación (Palabras)</label>
             <input type="text" id="actRating" placeholder="Ej: Excelente, Regular">
         </div>
         <div class="form-group"><label>¿Qué faltó?</label><input type="text" id="actMissing"></div>
-        <div class="form-group"><label>¿Qué se mejoraría/aumentaría?</label><input type="text" id="actImprove"></div>
+        <div class="form-group"><label>¿Qué se mejoraría?</label><input type="text" id="actImprove"></div>
     </div>
     <button onclick="saveActivity()"><i class="fa-solid fa-save"></i> Guardar Actividad</button>
 </div>
 
-<!-- Calendarios en lado a lado -->
+<!-- Calendarios -->
 <div class="calendars-container">
     <div id="currentMonthSection" class="month-section"></div>
     <div id="nextMonthSection" class="month-section"></div>
@@ -301,19 +469,19 @@
 <!-- Modal para Detalle y Comentarios -->
 <div id="detailModal" class="modal hidden">
     <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
         <h2 id="modalTitle" style="color: #38bdf8;"></h2>
         <div id="modalDetails"></div>
-        <hr style="border-color: var(--border); margin: 20px 0;">
+        <hr style="border-color: var(--border); margin: 15px 0;">
         
         <!-- Sección de Comentarios -->
         <div id="commentSection">
-            <h3><i class="fa-solid fa-comments"></i> Opiniones de Visitantes</h3>
+            <h3><i class="fa-solid fa-comments"></i> Opiniones</h3>
             <div id="commentsList"></div>
-            <div class="form-group" style="margin-top:15px;">
+            <div class="form-group" style="margin-top:12px;">
                 <label>Deja tu comentario (No se podrá borrar)</label>
                 <textarea id="newComment" rows="2" placeholder="Escribe aquí tu opinión..."></textarea>
-                <button onclick="submitComment()" style="margin-top:10px;"><i class="fa-solid fa-paper-plane"></i> Enviar Opinión</button>
+                <button onclick="submitComment()" style="margin-top:8px;"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
             </div>
         </div>
     </div>
@@ -322,11 +490,9 @@
 <!-- Scripts de Firebase Libs -->
 <script type="module">
 
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyA-RriIQQExYHjTikAa_CKYN81AZfdGSKk",
   authDomain: "mision-jbp-puerto-bermudez.firebaseapp.com",
@@ -336,17 +502,14 @@ const firebaseConfig = {
   appId: "1:522300449488:web:5ca675fee4a33c70bb74d5"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Variables de Estado Global
 let isAdmin = false;
 let dbActivities = {};
 let selectedDateString = "";
 let firstDayActivityId = null;
 
-// Hacer funciones accesibles globalmente para los clics en HTML
 window.toggleAdmin = function() {
     if (!isAdmin) {
         const pass = prompt("Introduce la contraseña de administrador:");
@@ -354,7 +517,7 @@ window.toggleAdmin = function() {
             isAdmin = true;
             document.getElementById("adminPanel").classList.remove("hidden");
             document.getElementById("userModeNotice").classList.add("hidden");
-            document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir de Admin';
+            document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir';
         } else {
             alert("Contraseña incorrecta");
         }
@@ -406,7 +569,7 @@ window.openDay = function(dateStr) {
     } else {
         acts.forEach((act, index) => {
             html += `
-                <div style="background:#0f172a; padding:15px; border-radius:8px; margin-bottom:15px; border-top: 4px solid ${index===0?'#3b82f6':'#ec4899'}">
+                <div class="modal-details-item">
                     <h3><i class="fa-solid fa-star"></i> ${act.name}</h3>
                     <p><strong><i class="fa-solid fa-location-dot"></i> Lugar:</strong> ${act.place || 'No asignado'}</p>
                     <p><strong><i class="fa-solid fa-bullseye"></i> Objetivo:</strong> ${act.objective || 'No asignado'}</p>
@@ -418,7 +581,6 @@ window.openDay = function(dateStr) {
                     <p><strong><i class="fa-solid fa-arrow-up-right-dots"></i> Mejoras:</strong> ${act.improve || 'Ninguna'}</p>
                 </div>
             `;
-            // El cuadro de opiniones solo se activa si es exactamente el primer día de la actividad
             if (act.start === dateStr) {
                 firstDayActivityId = act.id;
             }
@@ -428,7 +590,7 @@ window.openDay = function(dateStr) {
             document.getElementById("commentSection").classList.remove("hidden");
             loadComments(firstDayActivityId);
         } else {
-            html += `<p style="color:var(--text-muted); font-size:0.9rem;"><i class="fa-solid fa-info-circle"></i> Las opiniones solo se permiten en el primer día de inicio de la actividad.</p>`;
+            html += `<p style="color:var(--text-muted); font-size:0.85rem;"><i class="fa-solid fa-info-circle"></i> Las opiniones solo en el 1er día de la actividad.</p>`;
             document.getElementById("commentSection").classList.add("hidden");
         }
     }
@@ -473,7 +635,7 @@ function loadComments(actId) {
         Object.values(data).forEach(c => {
             const div = document.createElement("div");
             div.className = "comment-box";
-            div.innerHTML = `<p style="margin:0; font-size:0.95rem;">${c.text}</p>`;
+            div.innerHTML = `<p style="margin:0; font-size:0.9rem;">${c.text}</p>`;
             commentsList.appendChild(div);
         });
     }, (error) => {
@@ -481,7 +643,6 @@ function loadComments(actId) {
     });
 }
 
-// Lógica Matemática de Calendarios e Interfección de Fechas
 function getActivitiesForDate(dateStr) {
     let currentDayActs = [];
     Object.values(dbActivities).forEach(act => {
@@ -534,13 +695,12 @@ function renderCalendar(containerId, year, month, titleLabel) {
         num.innerText = day;
         card.appendChild(num);
 
-        // Verificar cuántas actividades coinciden hoy
         const dayActs = getActivitiesForDate(dateStr);
         if (dayActs.length === 1) {
             card.classList.add("bg-act-1");
             appendIndicator(card, dayActs[0].name);
         } else if (dayActs.length >= 2) {
-            card.classList.add("bg-act-double"); // Mitad azul, mitad rosa
+            card.classList.add("bg-act-double");
             appendIndicator(card, dayActs[0].name);
             appendIndicator(card, dayActs[1].name);
         }
@@ -571,11 +731,9 @@ function updateCalendars() {
     renderCalendar("nextMonthSection", nextMonthDate.getFullYear(), nextMonthDate.getMonth(), `${names[nextMonthDate.getMonth()]} ${nextMonthDate.getFullYear()}`);
 }
 
-// Llamar updateCalendars inmediatamente para mostrar calendarios vacíos mientras se cargan los datos
 console.log("Iniciando aplicación...");
 updateCalendars();
 
-// Escuchar cambios de la Base de Datos en Tiempo Real
 onValue(ref(db, 'activities'), (snapshot) => {
     dbActivities = snapshot.val() || {};
     console.log("Actividades cargadas:", dbActivities);
