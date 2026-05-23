@@ -302,6 +302,91 @@
             font-size: 1.05rem;
         }
 
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 400px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-left: 4px solid #34d399;
+        }
+
+        .toast-error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-left: 4px solid #fca5a5;
+        }
+
+        .toast-info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .toast-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
         /* Responsive Design */
         @media (max-width: 480px) {
             body {
@@ -363,6 +448,13 @@
 
             .close-btn {
                 font-size: 1.3rem;
+            }
+
+            .toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
             }
         }
 
@@ -510,6 +602,30 @@ let dbActivities = {};
 let selectedDateString = "";
 let firstDayActivityId = null;
 
+// Función para mostrar notificaciones tipo Toast
+function showToast(message, type = 'info') {
+    const toastContainer = document.createElement('div');
+    toastContainer.className = `toast toast-${type}`;
+    
+    let icon = 'fa-info-circle';
+    if (type === 'success') icon = 'fa-check-circle';
+    if (type === 'error') icon = 'fa-exclamation-circle';
+    
+    toastContainer.innerHTML = `
+        <i class="fa-solid ${icon} toast-icon"></i>
+        <div class="toast-message">${message}</div>
+        <button class="toast-close" onclick="this.parentElement.remove()"><i class="fa-solid fa-times"></i></button>
+    `;
+    
+    document.body.appendChild(toastContainer);
+    
+    // Auto-cerrar después de 4 segundos
+    setTimeout(() => {
+        toastContainer.classList.add('hide');
+        setTimeout(() => toastContainer.remove(), 300);
+    }, 4000);
+}
+
 window.toggleAdmin = function() {
     if (!isAdmin) {
         const pass = prompt("Introduce la contraseña de administrador:");
@@ -518,14 +634,16 @@ window.toggleAdmin = function() {
             document.getElementById("adminPanel").classList.remove("hidden");
             document.getElementById("userModeNotice").classList.add("hidden");
             document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-unlock"></i> Salir';
+            showToast('Modo administrador activado', 'success');
         } else {
-            alert("Contraseña incorrecta");
+            showToast('Contraseña incorrecta', 'error');
         }
     } else {
         isAdmin = false;
         document.getElementById("adminPanel").classList.add("hidden");
         document.getElementById("userModeNotice").classList.remove("hidden");
         document.getElementById("loginBtn").innerHTML = '<i class="fa-solid fa-lock"></i> Administrador';
+        showToast('Saliste del modo administrador', 'info');
     }
 }
 
@@ -542,17 +660,20 @@ window.saveActivity = function() {
     const missing = document.getElementById("actMissing").value;
     const improve = document.getElementById("actImprove").value;
 
-    if (!name || !start || !end) return alert("Nombre, Fecha de Inicio y Fin son obligatorios.");
+    if (!name || !start || !end) {
+        showToast('❌ Nombre, Fecha de Inicio y Fin son obligatorios', 'error');
+        return;
+    }
 
     const newActRef = push(ref(db, 'activities'));
     set(newActRef, {
         id: newActRef.key, name, place, start, end, objective, team, materials, emergency, rating, missing, improve
     }).then(() => {
-        alert("Actividad guardada con éxito");
+        showToast('✓ Actividad guardada con éxito', 'success');
         document.querySelectorAll("#adminPanel input, #adminPanel textarea").forEach(i => i.value = "");
     }).catch(error => {
         console.error("Error al guardar actividad:", error);
-        alert("Error al guardar: " + error.message);
+        showToast(`❌ Error al guardar: ${error.message}`, 'error');
     });
 }
 
@@ -606,7 +727,10 @@ window.closeModal = function() {
 
 window.submitComment = function() {
     const commentText = document.getElementById("newComment").value.trim();
-    if (!commentText || !firstDayActivityId) return;
+    if (!commentText || !firstDayActivityId) {
+        showToast('Por favor escribe un comentario', 'info');
+        return;
+    }
 
     const commentRef = push(ref(db, `comments/${firstDayActivityId}`));
     set(commentRef, {
@@ -614,10 +738,11 @@ window.submitComment = function() {
         timestamp: new Date().toISOString()
     }).then(() => {
         document.getElementById("newComment").value = "";
+        showToast('✓ Opinión enviada exitosamente', 'success');
         loadComments(firstDayActivityId);
     }).catch(error => {
         console.error("Error al guardar comentario:", error);
-        alert("Error: " + error.message);
+        showToast(`❌ Error: ${error.message}`, 'error');
     });
 }
 
@@ -740,6 +865,7 @@ onValue(ref(db, 'activities'), (snapshot) => {
     updateCalendars();
 }, (error) => {
     console.error("Error al cargar actividades de Firebase:", error);
+    showToast('Error al conectar con la base de datos', 'error');
 });
 </script>
 </body>
